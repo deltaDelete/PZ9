@@ -1,0 +1,70 @@
+﻿<Window x:Class="PZ9.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:PZ9"
+        mc:Ignorable="d"
+        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+        Title="MainWindow" Height="450" Width="800">
+    <Grid HorizontalAlignment="Stretch">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="10*"/>
+            <ColumnDefinition Width="1*"/>
+        </Grid.ColumnDefinitions>
+        <Button HorizontalAlignment="Left"
+                VerticalAlignment="Top"
+                Margin="10"
+                Content="X"
+                Height="32"
+                Width="32"
+                Panel.ZIndex="1"
+                Grid.ColumnSpan="2"
+                Click="CloseButtonClick"/>
+
+        <Border BorderBrush="Black"
+                BorderThickness="2"
+                MinWidth="128"
+                MinHeight="128"
+                MaxWidth="1920"
+                MaxHeight="1080">
+            <InkCanvas Background="White"
+                   x:Name="Canvas"/>
+        </Border>
+        <StackPanel Grid.Column="1"
+                    VerticalAlignment="Stretch">
+            <WrapPanel Orientation="Vertical">
+                <ListView ItemsSource="{Binding Colors}"
+                          x:Name="List1">
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <Button Background="{Binding }" 
+                                    Command="{Binding ElementName=List1, Path=DataContext.ButtonCommand}" 
+                                    CommandParameter="{Binding}">
+                                <Rectangle Fill="{Binding }" 
+                                           Height="16" 
+                                           Width="16"/>
+                            </Button>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+            </WrapPanel>
+            <StackPanel Orientation="Horizontal" 
+                        HorizontalAlignment="Center" 
+                        VerticalAlignment="Bottom">
+                <Button ToolTip="Очистить"
+                        Margin="5"
+                        Padding="2"
+                    Click="ClearButtonClick">
+                    <Image Source="clear.png" Width="32" Height="32" />
+                </Button>
+                <Button ToolTip="Сохранить"
+                        Margin="5"
+                        Padding="2"
+                        Click="SaveButtonClick">
+                    <Image Source="save.png" Width="32" Height="32" />
+                </Button>
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</Window>
