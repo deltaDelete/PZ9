@@ -29,14 +29,50 @@ public partial class MainWindow : Window
         InitializeComponent();
         DataContext = this;
         ButtonCommand = new Command<SolidColorBrush>(ColorButtonClick);
+        CloseCommand = new Command(Close);
+        SaveCommand = new Command(PreSave);
+        EditModeCommand = new Command(ModeChange);
+        AddTextCommand = new Command(AddText);
+        ClearCommand = new Command(Clear);
+        AddColorCommand = new Command(AddColor);
         Canvas.DefaultDrawingAttributes.Color = Color.FromRgb(0, 0, 0);
+        brushWidth = Canvas.DefaultDrawingAttributes.Width;
+        brushHeight = Canvas.DefaultDrawingAttributes.Height;
     }
+
+    private double brushWidth;
+    private double brushHeight;
+
 
     public ObservableCollection<SolidColorBrush> Colors { get; set; }
         = new(new[] { "#00ff00", "#ff0000", "#0000ff", "#ffff00", "#ff00ff", "#00ffff", "#ffffff", "#000000", "#333333" }
         .Select(x => new SolidColorBrush((Color)ColorConverter.ConvertFromString(x))));
+    public List<double> TextSizes { get; set; } = new()
+    {
+        9,
+        10,
+        11,
+        12,
+        14,
+        16,
+        18,
+        20,
+        24,
+        28,
+        30,
+        32,
+        48,
+        72
+    };
+    public List<FontFamily> FontFamilies { get; set; } = Fonts.SystemFontFamilies.ToList();
     public SolidColorBrush SelectedColor { get; set; }
     public ICommand ButtonCommand { get; private set; }
+    public ICommand CloseCommand { get; private set; }
+    public ICommand SaveCommand { get; private set; }
+    public ICommand EditModeCommand { get; private set; }
+    public ICommand AddTextCommand { get; private set; }
+    public ICommand ClearCommand { get; private set; }
+    public ICommand AddColorCommand { get; private set; }
 
     public int CanvasWidth { get => (int)Canvas.ActualWidth; }
     public int CanvasHeight { get => (int)Canvas.ActualHeight; }
@@ -44,6 +80,10 @@ public partial class MainWindow : Window
     public byte Red { get; set; }
     public byte Green { get; set; }
     public byte Blue { get; set; }
+    public bool IsDefaultChecked { get; set; } = true;
+    public bool IsSmallChecked { get; set; }
+    public bool IsMediumChecked { get; set; }
+    public bool IsLargeChecked { get; set; }
 
     public void ColorButtonClick(SolidColorBrush brush)
     {
@@ -53,18 +93,13 @@ public partial class MainWindow : Window
         Debug.WriteLine(brush.Color.ToString());
     }
 
-    private void ClearButtonClick(object sender, RoutedEventArgs e)
+    private void Clear()
     {
         Canvas.Strokes.Clear();
         Canvas.Children.Clear();
     }
 
-    private void CloseButtonClick(object sender, RoutedEventArgs e)
-    {
-        Close();
-    }
-
-    private void SaveButtonClick(object sender, RoutedEventArgs e)
+    private void PreSave()
     {
         Canvas.EditingMode = InkCanvasEditingMode.None;
         Save();
@@ -98,7 +133,7 @@ public partial class MainWindow : Window
         MessageBox.Show($"Файл успешно сохранен:\n{filename}");
     }
 
-    private void AddColorButtonClick(object sender, RoutedEventArgs e)
+    private void AddColor()
     {
         var color = Color.FromRgb(Red, Green, Blue);
 
@@ -109,18 +144,19 @@ public partial class MainWindow : Window
         Beb.Background = brush;
 
         Colors.Add(brush);
-
     }
 
-    private void SelectionButtonClick(object sender, RoutedEventArgs e)
+    private void ModeChange()
     {
-        Canvas.EditingMode = Canvas.EditingMode switch
+        InkCanvasEditingMode inkCanvasEditingMode = Canvas.EditingMode switch
         {
             InkCanvasEditingMode.Ink => InkCanvasEditingMode.Select,
             _ => InkCanvasEditingMode.Ink,
         };
+        Canvas.EditingMode = inkCanvasEditingMode;
     }
-    private void AddTextButtonClick(object sender, RoutedEventArgs e)
+
+    private void AddText()
     {
         var text = new TextBox
         {
@@ -134,5 +170,53 @@ public partial class MainWindow : Window
         Canvas.Children.Add(text);
 
         text.Focus();
+    }
+
+    private void RadioButtonChecked(object sender, RoutedEventArgs e)
+    {
+        var size = (brushWidth, brushHeight);
+
+        if (IsDefaultChecked)
+        {
+            size = (brushWidth, brushHeight);
+        }
+        else if (IsSmallChecked)
+        {
+            size = (1, 1);
+        }
+        else if (IsMediumChecked)
+        {
+            size = (10, 10);
+        }
+        else if (IsLargeChecked)
+        {
+            size = (50, 50);
+        }
+        Canvas.DefaultDrawingAttributes.Width = size.brushWidth;
+        Canvas.DefaultDrawingAttributes.Height = size.brushHeight;
+    }
+
+    private void FontSizeChanged(object sender, SelectionChangedEventArgs e) => FontSizeChange();
+
+    private void FontSizeChange()
+    {
+        var texts = Canvas.GetSelectedElements().Where(x => x is TextBox);
+        if (texts.Count() == 0) return;
+        foreach (TextBox text in texts)
+        {
+            text.FontSize = (double)FontSizeBox.SelectedItem;
+        }
+    }
+
+    private void FontFamilyChanged(object sender, SelectionChangedEventArgs e) => FontFamilyChange();
+
+    private void FontFamilyChange()
+    {
+        var texts = Canvas.GetSelectedElements().Where(x => x is TextBox);
+        if (texts.Count() == 0) return;
+        foreach (TextBox text in texts)
+        {
+            text.FontFamily = (FontFamily)FontFamilyBox.SelectedItem;
+        }
     }
 }
