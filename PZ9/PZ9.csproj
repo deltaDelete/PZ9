@@ -9,12 +9,21 @@
 
   <ItemGroup>
     <None Remove="clear.png" />
+    <None Remove="palette.png" />
     <None Remove="save.png" />
+    <None Remove="selection.png" />
+    <None Remove="text.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="text.png" />
   </ItemGroup>
 
   <ItemGroup>
     <Resource Include="clear.png" />
+    <Resource Include="palette.png" />
     <Resource Include="save.png" />
+    <Resource Include="selection.png" />
   </ItemGroup>
 
 </Project>

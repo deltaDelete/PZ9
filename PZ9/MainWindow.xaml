@@ -6,12 +6,31 @@
         xmlns:local="clr-namespace:PZ9"
         mc:Ignorable="d"
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+        d:Height="1000"
         Title="MainWindow" Height="450" Width="800">
     <Grid HorizontalAlignment="Stretch">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="10*"/>
             <ColumnDefinition Width="1*"/>
         </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="25"/>
+            <RowDefinition />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+        <Menu Grid.ColumnSpan="2"
+              Panel.ZIndex="2" VerticalAlignment="Top"
+              Height="25">
+            <MenuItem Header="Файл">
+                <MenuItem Header="Сохранить" Click="SaveButtonClick" />
+                <MenuItem Header="Выйти" Click="CloseButtonClick" />
+            </MenuItem>
+            <MenuItem Header="Редактирование">
+                <MenuItem Header="Режим редактирования" Click="SelectionButtonClick"/>
+                <MenuItem Header="Добавить текст" Click="AddTextButtonClick" />
+                <MenuItem Header="Очистить" Click="ClearButtonClick" />
+            </MenuItem>
+        </Menu>
         <Button HorizontalAlignment="Left"
                 VerticalAlignment="Top"
                 Margin="10"
@@ -20,10 +39,14 @@
                 Width="32"
                 Panel.ZIndex="1"
                 Grid.ColumnSpan="2"
+                Grid.Row="1"
                 Click="CloseButtonClick"/>
 
         <Border BorderBrush="Black"
                 BorderThickness="2"
+                Grid.RowSpan="2"
+                Grid.Row="1"
+                Margin="10"
                 MinWidth="128"
                 MinHeight="128"
                 MaxWidth="1920"
@@ -31,40 +54,81 @@
             <InkCanvas Background="White"
                    x:Name="Canvas"/>
         </Border>
-        <StackPanel Grid.Column="1"
-                    VerticalAlignment="Stretch">
-            <WrapPanel Orientation="Vertical">
-                <ListView ItemsSource="{Binding Colors}"
-                          x:Name="List1">
-                    <ListView.ItemTemplate>
-                        <DataTemplate>
-                            <Button Background="{Binding }" 
+
+        <ListView ItemsSource="{Binding Colors}"
+                  SelectedItem="{Binding SelectedColor}"
+                  Grid.Column="1"
+                  Grid.Row="1"
+                  HorizontalContentAlignment="Stretch"
+                  VerticalContentAlignment="Stretch"
+                  x:Name="List1">
+            <ListView.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <WrapPanel Orientation="Vertical" />
+                </ItemsPanelTemplate>
+            </ListView.ItemsPanel>
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <Button Background="{Binding }" 
                                     Command="{Binding ElementName=List1, Path=DataContext.ButtonCommand}" 
                                     CommandParameter="{Binding}">
-                                <Rectangle Fill="{Binding }" 
+                        <Rectangle Fill="{Binding }" 
                                            Height="16" 
                                            Width="16"/>
-                            </Button>
-                        </DataTemplate>
-                    </ListView.ItemTemplate>
-                </ListView>
-            </WrapPanel>
-            <StackPanel Orientation="Horizontal" 
-                        HorizontalAlignment="Center" 
-                        VerticalAlignment="Bottom">
-                <Button ToolTip="Очистить"
+                    </Button>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+        <ScrollViewer  Grid.Column="1"
+                       Grid.Row="2"
+                       ScrollViewer.VerticalScrollBarVisibility="Auto"
+                       HorizontalAlignment="Stretch"
+                       VerticalAlignment="Top">
+
+
+            <StackPanel Orientation="Vertical">
+                <StackPanel>
+                    <Slider Background="Red" Value="{Binding Red}" Minimum="0" Maximum="255"/>
+                    <Slider Background="Green" Value="{Binding Green}" Minimum="0" Maximum="255"/>
+                    <Slider Background="Blue" Value="{Binding Blue}" Minimum="0" Maximum="255"/>
+                </StackPanel>
+                <WrapPanel Orientation="Horizontal" 
+                       HorizontalAlignment="Center" 
+                       VerticalAlignment="Bottom">
+                    <Button ToolTip="Добавить цвет в палитру и применить" 
+                        Background="{Binding SelectedColor}"
+                        x:Name="Beb"
+                        Margin="5"
+                        Padding="2"
+                        Click="AddColorButtonClick">
+                        <Image Source="palette.png" Width="32" Height="32"/>
+                    </Button>
+                    <Button ToolTip="Очистить"
                         Margin="5"
                         Padding="2"
                     Click="ClearButtonClick">
-                    <Image Source="clear.png" Width="32" Height="32" />
-                </Button>
-                <Button ToolTip="Сохранить"
+                        <Image Source="clear.png" Width="32" Height="32" />
+                    </Button>
+                    <Button ToolTip="Сохранить"
                         Margin="5"
                         Padding="2"
                         Click="SaveButtonClick">
-                    <Image Source="save.png" Width="32" Height="32" />
-                </Button>
+                        <Image Source="save.png" Width="32" Height="32" />
+                    </Button>
+                    <Button ToolTip="Выделить"
+                        Margin="5"
+                        Padding="2"
+                        Click="SelectionButtonClick">
+                        <Image Source="selection.png" Width="32" Height="32" />
+                    </Button>
+                    <Button ToolTip="Добавить текст"
+                        Margin="5"
+                        Padding="2"
+                        Click="AddTextButtonClick">
+                        <Image Source="text.png" Width="32" Height="32" />
+                    </Button>
+                </WrapPanel>
             </StackPanel>
-        </StackPanel>
+        </ScrollViewer>
     </Grid>
 </Window>
