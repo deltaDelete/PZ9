@@ -15,17 +15,8 @@
         <KeyBinding Modifiers="Ctrl" Key="T" Command="{Binding AddTextCommand}" />
         <KeyBinding Modifiers="Ctrl" Key="D" Command="{Binding ClearCommand}" />
     </Window.InputBindings>
-    <Grid HorizontalAlignment="Stretch">
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="10*"/>
-            <ColumnDefinition Width="2*"/>
-        </Grid.ColumnDefinitions>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="25"/>
-            <RowDefinition />
-            <RowDefinition />
-        </Grid.RowDefinitions>
-        <Menu Grid.ColumnSpan="2"
+    <DockPanel HorizontalAlignment="Stretch" LastChildFill="True">
+        <Menu DockPanel.Dock="Top"
               Panel.ZIndex="2" VerticalAlignment="Top"
               Height="25">
             <MenuItem Header="Файл">
@@ -38,21 +29,118 @@
                 <MenuItem InputGestureText="Ctrl+D" Header="Очистить" Command="{Binding ClearCommand}" />
             </MenuItem>
         </Menu>
+
+        <ToolBarTray Height="48"
+                     DockPanel.Dock="Top">
+            <ToolBar Height="48" MinWidth="128">
+                <Button ToolTip="Сохранить"
+                        Height="32"
+                        Width="32"
+                        Margin="5"
+                        Padding="2"
+                        Command="{Binding SaveCommand}">
+                    <Image Source="save.png" />
+                </Button>
+                <Button ToolTip="Очистить"
+                        Height="32"
+                        Width="32"
+                        Margin="5"
+                        Padding="2"
+                                Command="{Binding ClearCommand}">
+                    <Image Source="clear.png" />
+                </Button>
+                <Button ToolTip="Выделить"
+                        Height="32"
+                        Width="32"
+                        Margin="5"
+                        Padding="2"
+                        Command="{Binding EditModeCommand}">
+                    <Image Source="selection.png" />
+                </Button>
+                <Button ToolTip="Добавить текст"
+                        Height="32"
+                        Width="32"
+                        Margin="5"
+                        Padding="2"
+                        Command="{Binding AddTextCommand}">
+                    <Image Source="text.png" />
+                </Button>
+                <ComboBox ItemsSource="{Binding TextSizes}" SelectionChanged="FontSizeChanged" x:Name="FontSizeBox" Margin="0 2" MinWidth="64"/>
+                <ComboBox ItemsSource="{Binding FontFamilies}" SelectionChanged="FontFamilyChanged" x:Name="FontFamilyBox" Margin="0 2" MinWidth="128"/>
+            </ToolBar>
+
+        </ToolBarTray>
         <Button HorizontalAlignment="Left"
                 VerticalAlignment="Top"
+                DockPanel.Dock="Left"
                 Margin="10"
                 Content="X"
                 Height="32"
                 Width="32"
-                Panel.ZIndex="1"
-                Grid.ColumnSpan="2"
-                Grid.Row="1"
                 Command="{Binding CloseCommand}"/>
 
+        <ToolBarTray DockPanel.Dock="Right"
+                     Orientation="Vertical"
+                     HorizontalAlignment="Right">
+            <ToolBar>
+                <ListView ItemsSource="{Binding Colors}"
+                          SelectedItem="{Binding SelectedColor}"
+                          DockPanel.Dock="Top"
+                          Width="100"
+                          Height="256"
+                          Margin="0 10 10 5"
+                          ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                          x:Name="List1">
+                    <ListView.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel IsItemsHost="True" />
+                        </ItemsPanelTemplate>
+                    </ListView.ItemsPanel>
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <Button Background="{Binding }" 
+                                        Command="{Binding ElementName=List1, Path=DataContext.ButtonCommand}" 
+                                        CommandParameter="{Binding}">
+                                <Rectangle Fill="{Binding }" 
+                                               Height="16" 
+                                               Width="16"/>
+                            </Button>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+                <StackPanel>
+                    <Slider Background="Red" Value="{Binding Red}" Minimum="0" Maximum="255"/>
+                    <Slider Background="Green" Value="{Binding Green}" Minimum="0" Maximum="255"/>
+                    <Slider Background="Blue" Value="{Binding Blue}" Minimum="0" Maximum="255"/>
+
+                    <WrapPanel HorizontalAlignment="Center">
+
+                        <Button ToolTip="Добавить цвет в палитру и применить" 
+                                Height="32"
+                                Width="32"
+                                x:Name="Beb"
+                                Margin="5"
+                                Padding="2"
+                                Command="{Binding AddColorCommand}">
+                            <Image Source="palette.png" />
+                        </Button>
+                        <Border BorderBrush="Black" BorderThickness="1" Width="32" Height="32">
+                            <Rectangle Fill="{Binding SelectedColor}"/>
+                        </Border>
+                    </WrapPanel>
+                </StackPanel>
+                <StackPanel Margin="0 2">
+                    <Label Content="Размер кисти" />
+                    <RadioButton GroupName="BrushSize" Checked="RadioButtonChecked" IsChecked="{Binding IsDefaultChecked}" Content="Стандартный" />
+                    <RadioButton GroupName="BrushSize" Checked="RadioButtonChecked" IsChecked="{Binding IsSmallChecked}" Content="Маленький" />
+                    <RadioButton GroupName="BrushSize" Checked="RadioButtonChecked" IsChecked="{Binding IsMediumChecked}" Content="Средний" />
+                    <RadioButton GroupName="BrushSize" Checked="RadioButtonChecked" IsChecked="{Binding IsLargeChecked}" Content="Большой" />
+                </StackPanel>
+            </ToolBar>
+        </ToolBarTray>
         <Border BorderBrush="Black"
                 BorderThickness="2"
-                Grid.RowSpan="2"
-                Grid.Row="1"
+                HorizontalAlignment="Stretch"
                 Margin="10"
                 MinWidth="128"
                 MinHeight="128"
@@ -61,93 +149,5 @@
             <InkCanvas Background="White"
                    x:Name="Canvas"/>
         </Border>
-
-        <ListView ItemsSource="{Binding Colors}"
-                  SelectedItem="{Binding SelectedColor}"
-                  Grid.Column="1"
-                  Grid.Row="1"
-                  Margin="0 10 10 5"
-                  ScrollViewer.VerticalScrollBarVisibility="Disabled"
-                  HorizontalContentAlignment="Stretch"
-                  VerticalContentAlignment="Stretch"
-                  x:Name="List1">
-            <ListView.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <WrapPanel Orientation="Vertical" />
-                </ItemsPanelTemplate>
-            </ListView.ItemsPanel>
-            <ListView.ItemTemplate>
-                <DataTemplate>
-                    <Button Background="{Binding }" 
-                                    Command="{Binding ElementName=List1, Path=DataContext.ButtonCommand}" 
-                                    CommandParameter="{Binding}">
-                        <Rectangle Fill="{Binding }" 
-                                           Height="16" 
-                                           Width="16"/>
-                    </Button>
-                </DataTemplate>
-            </ListView.ItemTemplate>
-        </ListView>
-        <ScrollViewer  Grid.Column="1"
-                       Grid.Row="2"
-                       Margin="0 5 10 10"
-                       ScrollViewer.VerticalScrollBarVisibility="Auto"
-                       HorizontalAlignment="Stretch"
-                       VerticalAlignment="Top">
-
-
-            <StackPanel Orientation="Vertical">
-                <StackPanel>
-                    <Slider Background="Red" Value="{Binding Red}" Minimum="0" Maximum="255"/>
-                    <Slider Background="Green" Value="{Binding Green}" Minimum="0" Maximum="255"/>
-                    <Slider Background="Blue" Value="{Binding Blue}" Minimum="0" Maximum="255"/>
-                </StackPanel>
-                <WrapPanel Orientation="Horizontal" 
-                       HorizontalAlignment="Center" 
-                       VerticalAlignment="Bottom">
-                    <Button ToolTip="Добавить цвет в палитру и применить" 
-                        Background="{Binding SelectedColor}"
-                        x:Name="Beb"
-                        Margin="5"
-                        Padding="2"
-                        Command="{Binding AddColorCommand}">
-                        <Image Source="palette.png" Width="32" Height="32"/>
-                    </Button>
-                    <Button ToolTip="Очистить"
-                        Margin="5"
-                        Padding="2"
-                            Command="{Binding ClearCommand}">
-                        <Image Source="clear.png" Width="32" Height="32" />
-                    </Button>
-                    <Button ToolTip="Сохранить"
-                        Margin="5"
-                        Padding="2"
-                        Command="{Binding SaveCommand}">
-                        <Image Source="save.png" Width="32" Height="32" />
-                    </Button>
-                    <Button ToolTip="Выделить"
-                        Margin="5"
-                        Padding="2"
-                        Command="{Binding EditModeCommand}">
-                        <Image Source="selection.png" Width="32" Height="32" />
-                    </Button>
-                    <Button ToolTip="Добавить текст"
-                        Margin="5"
-                        Padding="2"
-                        Command="{Binding AddTextCommand}">
-                        <Image Source="text.png" Width="32" Height="32" />
-                    </Button>
-                </WrapPanel>
-                <StackPanel>
-                    <Label Content="Размер кисти" />
-                    <RadioButton GroupName="BrushSize" Checked="RadioButtonChecked" IsChecked="{Binding IsDefaultChecked}" Content="Стандартный" />
-                    <RadioButton GroupName="BrushSize" Checked="RadioButtonChecked" IsChecked="{Binding IsSmallChecked}" Content="Маленький" />
-                    <RadioButton GroupName="BrushSize" Checked="RadioButtonChecked" IsChecked="{Binding IsMediumChecked}" Content="Средний" />
-                    <RadioButton GroupName="BrushSize" Checked="RadioButtonChecked" IsChecked="{Binding IsLargeChecked}" Content="Большой" />
-                </StackPanel>
-                <ComboBox ItemsSource="{Binding TextSizes}" SelectionChanged="FontSizeChanged" x:Name="FontSizeBox"/>
-                <ComboBox ItemsSource="{Binding FontFamilies}" SelectionChanged="FontFamilyChanged" x:Name="FontFamilyBox"/>
-            </StackPanel>
-        </ScrollViewer>
-    </Grid>
+    </DockPanel>
 </Window>

@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
@@ -36,12 +37,14 @@ public partial class MainWindow : Window
         ClearCommand = new Command(Clear);
         AddColorCommand = new Command(AddColor);
         Canvas.DefaultDrawingAttributes.Color = Color.FromRgb(0, 0, 0);
+        selectedColor = Colors.Where(x => x.Color == Canvas.DefaultDrawingAttributes.Color).First();
         brushWidth = Canvas.DefaultDrawingAttributes.Width;
         brushHeight = Canvas.DefaultDrawingAttributes.Height;
     }
 
     private double brushWidth;
     private double brushHeight;
+    private SolidColorBrush selectedColor;
 
 
     public ObservableCollection<SolidColorBrush> Colors { get; set; }
@@ -65,7 +68,10 @@ public partial class MainWindow : Window
         72
     };
     public List<FontFamily> FontFamilies { get; set; } = Fonts.SystemFontFamilies.ToList();
-    public SolidColorBrush SelectedColor { get; set; }
+    public SolidColorBrush SelectedColor { 
+        get => selectedColor;
+        set => RaiseAndSetIfChanged(ref selectedColor, value);
+    }
     public ICommand ButtonCommand { get; private set; }
     public ICommand CloseCommand { get; private set; }
     public ICommand SaveCommand { get; private set; }
@@ -89,7 +95,7 @@ public partial class MainWindow : Window
     {
         Canvas.DefaultDrawingAttributes.Color = brush.Color;
         SelectedColor = brush;
-        Beb.Background = brush;
+        //Beb.Background = brush;
         Debug.WriteLine(brush.Color.ToString());
     }
 
@@ -141,7 +147,7 @@ public partial class MainWindow : Window
         var brush = new SolidColorBrush(color);
         if (Colors.Any(x => x.Color == color)) return;
         SelectedColor = brush;
-        Beb.Background = brush;
+        //Beb.Background = brush;
 
         Colors.Add(brush);
     }
